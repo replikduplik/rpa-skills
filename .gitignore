@@ -1,0 +1,16 @@
+# documentation
+docs/
+
+# other ignored directories
+node_modules/
+dist/
+build/
+.next/
+.vercel/
+.npm/
+.pnp/
+.yarn/
+.yarn/cache/
+.yarn/unplugged/
+.yarn/build-state.yml
+.yarn/install-state.gz
