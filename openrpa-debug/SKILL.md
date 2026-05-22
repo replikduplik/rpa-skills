@@ -33,12 +33,13 @@ Hata mesajı / semptom
 | `Element not found` / `MinResults not met` | → Bölüm 1 |
 | `Timeout` / robot dondu / beklemeye geçti | → Bölüm 2 |
 | `NullReferenceException` | → Bölüm 3 |
-| `COMException` / Office hataları | → Bölüm 4 |
+| `COMException` / Office hataları / Excel kilitli | → Bölüm 4 |
 | SAP script hataları | → Bölüm 5 |
 | Web portal (NativeMessaging) hataları | → Bölüm 6 |
 | Selector kırıldı — dün çalışıyordu | → Bölüm 7 |
 | InvokeCode C# exception | → Bölüm 8 |
 | Genel iş mantığı hatası (yanlış sonuç) | → Bölüm 9 |
+| WorkItem "processing"te takılı kaldı | → Bölüm 10 |
 
 ---
 
@@ -561,3 +562,41 @@ Error: Access denied, no authorization to UpdateOne with current ACL
 **Sebep:** Kullanıcının ilgili kayıt üzerinde güncelleme yetkisi yok.
 
 **Çözüm:** Orchestrator admin paneline root kullanıcıyla giriş → kullanıcı yetkilerini düzenle.
+
+---
+
+## Bölüm 10 (Ek) — WorkItem "processing"te Takılı Kaldı
+
+**Semptom:** OpenFlow → WorkItems filtresinde item `state=processing` olarak görünüyor ama robot çalışmıyor. Kuyruk yeni item almayı durduruyor.
+
+**Sebep:** Robot beklenmedik şekilde çöktüğünde `UpdateWorkitem` çağrılamamış — item processing'te asılı kalıyor.
+
+### Teşhis Adımları
+
+```
+[ ] 1. OpenFlow → WorkItems → state=processing filtresi → hangi item takılı?
+[ ] 2. İlgili robotun durumu nedir? (Online/Offline?)
+       Offline ise → robotu yeniden başlat
+[ ] 3. Takılı item ne kadar süredir processing?
+       5 dakika+ ise → robot crash etmiş olabilir
+[ ] 4. Workflow loglarına bak — son adım nerede kesilmiş?
+```
+
+### Hızlı Çözüm
+
+```
+OpenFlow → WorkItems → takılı item → "Retry" → state=new'e döner → robot tekrar alır
+```
+
+### Kalıcı Çözüm — Finally Bloğu
+
+```
+# WorkItem işleme şablonuna her zaman Finally ekle:
+TryCatch
+  Try     → [iş mantığı] → UpdateWorkitem (successful)
+  Catch   → Log (Error)
+  Finally → item hâlâ "processing"teyse → UpdateWorkitem (failed)
+```
+
+**Not:** Finally bloğu robot çökse bile çalışmaya çalışır.
+Detaylı şablon: `openrpa-openflow/SKILL.md` → WorkItem İşleme bölümü.

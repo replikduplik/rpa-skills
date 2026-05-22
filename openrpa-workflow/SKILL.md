@@ -22,7 +22,8 @@ Her robot = `.xaml` dosyası. Yapı tercihi: **Sequence** (Flowchart yerine).
 |---|---|
 | Windows masaüstü (Polisoft, Open, ERP) | `Windows` (UIAutomation) |
 | SAP GUI | `Windows` — SAP selector sözdizimi |
-| Chrome / Firefox (sigorta web portalleri) | `NativeMessaging (NM)` |
+| Chrome / Firefox — Epoch/X (YENİ STANDART) | `Playwright` aktiviteleri |
+| Chrome / Firefox — Vanilla OpenRPA | `NativeMessaging (NM)` |
 | Internet Explorer | `IE` |
 | Java uygulamaları | `Java` |
 | Excel / Word / Outlook | `Office` + COM Interop |
@@ -50,18 +51,31 @@ TryCatch
 
 ### 2. Retry (Geçici Hata Toleransı)
 
-Ağ hataları ve geçici ekran donmaları için:
+**Önce hata tipini ayırt et:**
+- **İş Hatası (BusinessException):** Geçersiz TC kimlik, boş poliçe no, müşteri bulunamadı → retry YAPMA, direkt `failed` yap
+- **Sistem Hatası (SystemException):** Timeout, ağ kopması, SAP yavaşlığı → retry YAP
 
-```
-retry_sayac = 0
-While (retry_sayac < 3)
-  TryCatch
-    Try
-      [kritik adım]
-      Break  ← başarılıysa döngüden çık
-    Catch
-      retry_sayac = retry_sayac + 1
-      Delay 2000ms
+```csharp
+// InvokeCode — exponential backoff retry
+int deneme = 0;
+while (deneme < 3)
+{
+    try
+    {
+        // [kritik adım]
+        break;  // başarılıysa çık
+    }
+    catch (Exception e) when (deneme < 2)
+    {
+        // İş hatası mı? retry etme
+        if (e.Message.Contains("geçersiz") || e.Message.Contains("bulunamadı"))
+            throw;
+
+        deneme++;
+        int bekle = 2000 * deneme;  // 2s → 4s → 8s (exponential backoff)
+        System.Threading.Thread.Sleep(bekle);
+    }
+}
 ```
 
 ### 3. Credential Yönetimi (Güvenlik)
@@ -363,14 +377,36 @@ GetElement      → hedef ekran yüklendi mi?
 ### Office — Excel
 
 ```csharp
-// InvokeCode — Excel COM ile toplu okuma
-var xl = (Microsoft.Office.Interop.Excel.Application)
-    System.Runtime.InteropServices.Marshal.GetActiveObject("Excel.Application");
-var ws = (Microsoft.Office.Interop.Excel.Worksheet)xl.ActiveSheet;
-int sonSatir = ws.UsedRange.Rows.Count;
-var tablo = new System.Data.DataTable();
-// ... sütun ve satırları oku
-ciktiDataTable = tablo;
+// InvokeCode — Excel COM ile toplu okuma + ZORUNLU cleanup
+Microsoft.Office.Interop.Excel.Application xl = null;
+Microsoft.Office.Interop.Excel.Workbook wb = null;
+Microsoft.Office.Interop.Excel.Worksheet ws = null;
+try
+{
+    xl = (Microsoft.Office.Interop.Excel.Application)
+        System.Runtime.InteropServices.Marshal.GetActiveObject("Excel.Application");
+    wb = xl.ActiveWorkbook;
+    ws = (Microsoft.Office.Interop.Excel.Worksheet)xl.ActiveSheet;
+    int sonSatir = ws.UsedRange.Rows.Count;
+    var tablo = new System.Data.DataTable();
+    // ... sütun ve satırları oku
+    ciktiDataTable = tablo;
+}
+finally
+{
+    // ⚠️ COM nesnelerini mutlaka serbest bırak — yoksa EXCEL.EXE arka planda kalır
+    // ve sonraki çalışmada "dosya kilitli" hatası alırsın
+    if (ws != null) System.Runtime.InteropServices.Marshal.ReleaseComObject(ws);
+    if (wb != null) System.Runtime.InteropServices.Marshal.ReleaseComObject(wb);
+    if (xl != null)
+    {
+        xl.Quit();
+        System.Runtime.InteropServices.Marshal.ReleaseComObject(xl);
+    }
+    ws = null; wb = null; xl = null;
+    GC.Collect();
+    GC.WaitForPendingFinalizers();
+}
 ```
 
 ### Mail — Outlook

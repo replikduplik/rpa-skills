@@ -89,12 +89,23 @@ Sequence
         │         item: item, state: "successful"
         │         payload: { "Sonuc": teklifNo, "IslemZamani": DateTime.Now }
         │
-        └── Catch (Exception e)
-            ├── Log → level: Error, message: e.Message
-            └── UpdateWorkitem
-                  item: item
-                  state: "failed"
-                  error: e.Message + " | " + e.StackTrace.Substring(0,500)
+        ├── Catch (Exception e)
+        │   └── Log → level: Error, message: e.Message + e.StackTrace
+        │
+        └── Finally   ← KRİTİK: her koşulda WorkItem durumunu güncelle
+            └── InvokeCode
+                  // item hâlâ "processing"te mi? → failed yap
+                  if (item != null && item.state == "processing")
+                  {
+                      item.state = "failed";
+                      item.errormessage = "Beklenmedik sonlanma";
+                      // UpdateWorkitem aktivitesini Finally'de de çağır
+                  }
+
+# ⚠️ NEDEN Finally zorunlu?
+# Catch'e ulaşamadan robot çökerse WorkItem sonsuza kadar
+# "processing" durumunda kalır → kuyruk tıkanır.
+# Finally her durumda çalışır: Try başarılı, Catch yakaladı veya crash.
 ```
 
 ### Payload'a Erişim (InvokeCode)

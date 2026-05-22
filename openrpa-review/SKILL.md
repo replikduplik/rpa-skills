@@ -169,6 +169,22 @@ HataRaporla.xaml       ← tek sorumluluk: bildirim gönder
 [ ] Retry sayısı sınırlı mı? (sonsuz retry → robot asla ilerlemez)
 [ ] Exponential backoff var mı? (hemen retry → aynı hata)
 [ ] Kalıcı hata retry'dan muaf mı? (geçersiz veri → direkt failed)
+[ ] BusinessException (iş hatası) ile SystemException (teknik hata) ayrımı var mı?
+      BusinessException → retry etme, direkt failed yap
+      SystemException   → retry yap, backoff uygula
+```
+
+---
+
+### 10. Süreç Kalitesi (Otomasyon Öncesi)
+
+```
+[ ] Otomatize edilecek süreç manuel olarak istikrarlı çalışıyor mu?
+      Hayır → önce süreci düzelt, sonra otomatize et
+      "Kırık süreci robot daha hızlı kırar, iyileştirmez"
+[ ] İstisna oranı kabul edilebilir seviyede mi? (%5 altı önerilir)
+[ ] Tüm varyantlar (edge case) belgelenmiş mi?
+[ ] Sürecin sık değişmesi bekleniyor mu? → bakım maliyetini hesapla
 ```
 
 **Retry şablonu:**
@@ -195,6 +211,8 @@ while (deneme < 3)
 | TryCatch yok | idx selector | Log format |
 | Sonsuz döngü riski | Modülerlik eksik | Yorum satırı |
 | Null kontrolü yok | Retry yok | Değişken scope |
+| WorkItem Finally yok | BusinessException ayrımı yok | Exponential backoff |
+| Excel COM cleanup yok | Kırık süreç otomatize | Console.WriteLine (Epoch/X) |
 
 ---
 

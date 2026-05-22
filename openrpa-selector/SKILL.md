@@ -65,8 +65,10 @@ url="https://portal.*"    ← alt domain farklı olsa da çalışır
 <ctrl name="Giriş" type="Button" />
 <ctrl name="btnGiris" type="Button" />
 
-<!-- Grid/Liste satırı — idx ile -->
-<ctrl type="DataItem" idx="2" />
+<!-- Grid/Liste satırı — idx KULLANMA, kırılır! -->
+<!-- ❌ <ctrl type="DataItem" idx="2" />  → uygulama değişince bozulur -->
+<!-- ✅ Bunun yerine name, automationid veya GetElement(MaxResults) ile tüm satırları al -->
+<ctrl type="DataItem" name="PN-2024-98765" />   <!-- stabil: kayıt adı ile eşleş -->
 ```
 
 **Delphi/VCL uygulamalar (Polisoft genellikle Delphi):**

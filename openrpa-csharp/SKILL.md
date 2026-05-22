@@ -21,7 +21,10 @@ description: >
      System.DateTime.Now  (DateTime.Now değil)
      System.Text.StringBuilder
 4. Hata → workflow TryCatch'e fırlatır (throw kullan)
-5. Console.WriteLine → OpenRPA Output panelinde görünür (debug için)
+5. Debug output:
+   - Epoch/X Creator Studio → EpochxWriteLine aktivitesi kullan (Console.WriteLine desteklenmiyor!)
+   - Vanilla OpenRPA       → Console.WriteLine Output panelinde görünür
+   ⚠️ Epoch/X'te Console.WriteLine uyarı üretir, output'a yazmaz.
 ```
 
 ---

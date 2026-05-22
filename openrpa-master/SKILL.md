@@ -62,6 +62,7 @@ Prompt içeriyorsa               → Git buraya
 "InvokeCode", "C# kodu"         → openrpa-csharp + notes/InvokeCode.md
 "Polisoft", "teklif", "hasar"   → openrpa-polisoft-deep + openrpa-workflow
 "queue", "workitem", "kuyruk"   → openrpa-openflow
+"workitem takıldı", "processing" → openrpa-debug Bölüm 10 (Ek)
 "invoke", "PowerShell", "tetikle" → openrpa-invoke + notes/InvokeWorkflow.md
 "workflow doğru mu", "review"   → openrpa-review
 "hangi aktivite", "nasıl yapılır" → openrpa-workflow + ilgili notes/
@@ -71,6 +72,9 @@ Prompt içeriyorsa               → Git buraya
 "Delay", "bekleme"              → notes/Delay.md
 "ForEach", "döngü", "loop"      → notes/ForEach-BreakableLoop.md
 "OpenApplication", "pencere"    → notes/OpenApplication.md
+"Excel kilitlendi", "COM hatası" → openrpa-debug Bölüm 4 + openrpa-workflow Excel COM
+"BusinessException", "iş hatası" → openrpa-workflow Bölüm 2 (Retry + İş/Sistem ayrımı)
+"Console.WriteLine", "EpochxWriteLine" → openrpa-csharp InvokeCode Temel Kurallar
 "fork farkı keşfettim"          → fork-differences.md güncelle
 "yeni aktivite notu"            → notes/ altına yeni .md ekle
 "yeni şablon"                   → templates/ altına .md ekle
