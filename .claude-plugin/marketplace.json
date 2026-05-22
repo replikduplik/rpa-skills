@@ -1,6 +1,6 @@
 {
   "name": "openrpa-skills",
-  "description": "OpenRPA / Creator Studio gelistirme asistani. Sigorta sektoru odakli RPA skill seti.",
+  "description": "OpenRPA Creator Studio gelistirme asistani. RPA skill seti.",
   "owner": {
     "name": "replikduplik"
   },
@@ -8,7 +8,7 @@
     {
       "name": "openrpa-assistant",
       "description": "Workflow tasarimi, web otomasyon, selector, debug, review, C#, Polisoft ve OpenFlow icin kapsamli rehber.",
-      "source": "."
+      "source": "./"
     }
   ]
 }
