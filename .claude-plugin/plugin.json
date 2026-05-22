@@ -1,7 +1,6 @@
 {
   "name": "openrpa-assistant",
-  "version": "0.2.0",
-  "description": "OpenRPA / Creator Studio gelistirme asistani — workflow tasarimi, web otomasyon, selector, debug, review, C#, Polisoft ve OpenFlow icin uzmanlasmis skill seti.",
+"description": "OpenRPA / Creator Studio gelistirme asistani — workflow tasarimi, web otomasyon, selector, debug, review, C#, Polisoft ve OpenFlow icin uzmanlasmis skill seti.",
   "author": { "name": "replikduplik" },
   "keywords": ["openrpa", "creator-studio", "rpa", "otomasyon", "sigorta", "polisoft", "playwright", "openflow"],
   "skills": [
