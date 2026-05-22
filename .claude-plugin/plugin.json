@@ -1,9 +1,9 @@
 {
   "name": "openrpa-assistant",
   "version": "0.2.0",
-  "description": "Epoch/X Creator Studio 2.0 geliştirme asistanı — workflow tasarımı, Playwright web otomasyon, selector, debug, review, C#, Polisoft ve OpenFlow için uzmanlaşmış skill seti. Sigorta sektörü odaklı.",
-  "author": { "name": "Çağdaş" },
-  "keywords": ["openrpa", "epochx", "creator-studio", "rpa", "otomasyon", "sigorta", "polisoft", "playwright", "openflow"],
+  "description": "OpenRPA / Creator Studio gelistirme asistani — workflow tasarimi, web otomasyon, selector, debug, review, C#, Polisoft ve OpenFlow icin uzmanlasmis skill seti.",
+  "author": { "name": "replikduplik" },
+  "keywords": ["openrpa", "creator-studio", "rpa", "otomasyon", "sigorta", "polisoft", "playwright", "openflow"],
   "skills": [
     "openrpa-master",
     "openrpa-workflow",
