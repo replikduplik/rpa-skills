@@ -561,4 +561,3 @@ Error: Access denied, no authorization to UpdateOne with current ACL
 **Sebep:** Kullanıcının ilgili kayıt üzerinde güncelleme yetkisi yok.
 
 **Çözüm:** Orchestrator admin paneline root kullanıcıyla giriş → kullanıcı yetkilerini düzenle.
- 

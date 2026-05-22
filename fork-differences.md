@@ -256,4 +256,3 @@ Status bar'da görünür: `NM : offline`
 2. Claude sana vanilla OpenRPA sözdizimi söylerse ve Epoch/X'te farklı çalışıyorsa:
    - Fork farkı olarak kaydet
    - Claude'u düzelt: "Epoch/X'te bu farklı çalışıyor: ..."
- 
