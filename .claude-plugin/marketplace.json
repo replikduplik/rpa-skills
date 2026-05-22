@@ -1,0 +1,11 @@
+{
+  "name": "Epoch/X RPA Skills",
+  "description": "Epoch/X Creator Studio 2.0 için uzmanlaşmış Claude skill seti. Sigorta sektörü odaklı OpenRPA geliştirme asistanı.",
+  "plugins": [
+    {
+      "name": "openrpa-assistant",
+      "description": "Workflow tasarımı, Playwright web otomasyon, selector, debug, review, C#, Polisoft ve OpenFlow için kapsamlı rehber.",
+      "path": "."
+    }
+  ]
+}

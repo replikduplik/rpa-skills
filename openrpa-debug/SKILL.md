@@ -1,11 +1,13 @@
 ---
 name: openrpa-debug
 description: >
-  Use when an OpenRPA workflow throws an error, produces wrong output, or stops
-  unexpectedly. Triggers on: error messages, stack traces, "element not found",
-  "timeout", "NullReferenceException", "selector kırıldı", "robot takıldı",
-  "log analizi", "hata teşhis", "neden çalışmıyor", SAP script errors,
-  web portal errors, InvokeCode exceptions, "robot durdu".
+  Use when an OpenRPA / Epoch/X Creator Studio workflow throws an error, produces
+  wrong output, or stops unexpectedly. Triggers on: error messages, stack traces,
+  "element not found", "timeout", "NullReferenceException", "selector kırıldı",
+  "robot takıldı", "log analizi", "hata teşhis", "neden çalışmıyor",
+  "Update Required", "NM offline", "Business Log devam ediyor", "WorkItem Queue
+  oluşturulamıyor", "Orchestrator bağlanamıyor", "Console.WriteLine uyarısı",
+  SAP script errors, web portal errors, Playwright errors, InvokeCode exceptions.
 ---
 
 # OpenRPA Debug — Hata Teşhis Rehberi
@@ -373,3 +375,189 @@ Console.WriteLine($"DEBUG policeNo={policeNo}, brans={brans}");
 | `Debug` | Geliştirme sırasında değişken değerleri |
 
 **Production'da Debug logları kapat** — performans etkiler.
+
+---
+
+## Bölüm 10 — Epoch/X Creator Studio Özel Hataları
+
+Bu bölüm vanilla OpenRPA'da bulunmayan, Epoch/X platformuna özgü hata ve çözümleri içerir.
+
+### "Update Required" — Versiyon Zorunluluğu
+
+```
+Cannot run workflow: minimum required version is 1.5, 
+but your version is 1.4.57. Please update EpochxCreatorStudio.
+```
+veya
+```
+This version of EpochxCreatorStudio is no longer supported. 
+Minimum required version: 1.5. The application will now close — please update.
+```
+
+**Sebep:** Orchestrator, minimum versiyon zorunluluğu getirdi.
+**Çözüm:** Creator Studio'yu güncelle (IT'den veya şirket dağıtım kanalından).
+
+---
+
+### "NM : offline" — NativeMessaging Bağlantısı Koptu
+
+**Semptom:** Status bar'da `NM : offline` görünüyor. Web otomasyon aktiviteleri çalışmıyor.
+
+**En yaygın sebep:** Robot çalışırken Chrome kapatılıp açıldı.
+
+**Çözüm:**
+1. Creator Studio'yu kapat ve yeniden aç (robotu yeniden başlat)
+2. Chrome Extension (epochxcreatorstudio) etkin mi kontrol et
+3. Workflow başına NM durum kontrolü ekle:
+
+```
+GetElement → herhangi bir Chrome elementi
+  Timeout: 3000
+  MinResults: 0
+If (element null) → NM offline → workflow'u durdur, bildirim gönder
+```
+
+---
+
+### Business Log "devam ediyor" Takılı Kalıyor
+
+**Semptom:** İşlem bitmiş olmasına rağmen Business Log panelinde "devam ediyor" statüsünde kalıyor.
+
+**Sebep:** Insert sonrası çok hızlı Update atılırsa (aralarında hiçbir aktivite yoksa) log güncellenemiyor — race condition.
+
+**Geçici Çözüm:**
+```
+[Business Log Insert aktivitesi]
+Delay 500ms          ← kritik — bu delay olmadan update çalışmayabilir
+[Business Log Update aktivitesi]
+```
+
+---
+
+### WorkItem Queue Oluşturulamıyor
+
+**Semptom:** WorkItem Queue ekranında hiçbir role/project görünmüyor. Queue oluşturma başarısız.
+
+**Sebep:** Yeni müşteri/robot migration sonrası admin yetkisi devreye alınmamış.
+
+**Çözüm:** Orchestrator admin panelinden ilgili kullanıcıya WorkItem Queue oluşturma yetkisi ver. IT/Epoch ekibine ilet.
+
+---
+
+### Orchestrator Bağlantı Kesilmesi
+
+```
+[Debug] Disconnected from wss://orchestrator.epochaix.co/ 
+reason: Unable to connect to the remote server
+```
+
+**Olası Sebepler (sırayla kontrol et):**
+
+```
+[ ] 1. Orchestrator URL doğru mu? Settings → bağlantı adresini kontrol et
+[ ] 2. İnternet/VPN bağlantısı var mı?
+[ ] 3. Firewall 443 portuna izin veriyor mu? (WebSocket üzerinden çalışır)
+[ ] 4. URL yanlışsa → Creator Studio CPU %100 loop'a düşer!
+       Kontrol: Task Manager → Creator Studio CPU kullanımı
+       Çözüm: Settings'ten doğru wss:// adresini gir
+```
+
+---
+
+### "Console.WriteLine çağrıları hala mevcuttur" Uyarısı
+
+**Semptom:**
+```
+Console.WriteLine çağrıları hala mevcuttur. 
+[X] özel aktivitesine dönüştürülmemiştir.
+```
+
+**Sebep:** Epoch/X 2.0'da `Console.WriteLine` InvokeCode içinde desteklenmiyor.
+
+**Çözüm:** `Console.WriteLine` → `EpochxWriteLine` aktivitesi ile değiştir.
+```csharp
+// ❌ Eski
+Console.WriteLine($"DEBUG: policeNo={policeNo}");
+
+// ✅ Yeni — EpochxWriteLine aktivitesini kullan (toolbox'tan sürükle)
+// Veya Log aktivitesi (Debug seviyesi)
+```
+
+---
+
+### Business Log ID Tipi Hatası (1.x → 2.0 Geçiş)
+
+**Semptom:** Eski workflow'u 2.0'da açınca InvokeCode kırmızıya dönüyor.
+
+**Sebep:** ID tipi `string` → `System.Guid` olarak değişti.
+
+```csharp
+// ❌ 1.x tarzı — 2.0'da derleme hatası
+string str_MainID = "POL" + Guid.NewGuid().ToString();
+
+// ✅ 2.0 standardı
+System.Guid guid_MainID = System.Guid.NewGuid();
+```
+
+---
+
+### Creator Studio CPU %100 / "Yanıt Vermiyor"
+
+**Semptom:** Task Manager'da Creator Studio CPU'yu sürekli %99-100 kullanıyor.
+
+**En yaygın sebep:** Orchestrator'a bağlanamıyor → bağlantı döngüsüne giriyor.
+
+**Teşhis:**
+```
+[ ] Status bar'da bağlantı durumu nedir? (sol alt köşe)
+[ ] Settings → Orchestrator URL doğru mu?
+[ ] Ağ bağlantısı var mı?
+```
+
+**Çözüm:** URL'yi düzelt → Creator Studio'yu yeniden başlat.
+
+**Diğer sebep:** Uzun çalışmalarda (2+ saat) RAM birikmesi. Çözüm: periyodik yeniden başlatma.
+
+---
+
+### Playwright XPath Kaçış Karakteri Hatası
+
+**Semptom:** Playwright aktivitesi selector parse hatası veriyor.
+
+```csharp
+// ❌ YANLIŞ — backslash kaçış karakteri hata veriyor
+"xpath=//input[@id=\'Username\']"
+
+// ✅ DOĞRU — tek tırnak içinde, kaçış yok
+"xpath=//input[@id='Username']"
+```
+
+---
+
+### Image Kaybı — Workflow Import Sonrası
+
+**Semptom:** 2.0'a import edilen workflow'da image aktiviteleri boş kalıyor veya çalışmıyor.
+
+**Sebep:** Import sırasında image tanımları siliniyor (bilinen platform sorunu).
+
+**Çözüm:**
+1. Eski XAML dosyasını aç (metin editörü ile)
+2. Image ID referanslarını bul
+3. Image dosyasını base64'e çevir:
+```csharp
+string base64 = System.Convert.ToBase64String(
+    System.IO.File.ReadAllBytes(@"C:\resim.png"));
+```
+4. XAML'deki ID'yi base64 string ile değiştir
+
+---
+
+### ACL / UpdateOne Yetki Hatası
+
+```
+Error: Access denied, no authorization to UpdateOne with current ACL
+```
+
+**Sebep:** Kullanıcının ilgili kayıt üzerinde güncelleme yetkisi yok.
+
+**Çözüm:** Orchestrator admin paneline root kullanıcıyla giriş → kullanıcı yetkilerini düzenle.

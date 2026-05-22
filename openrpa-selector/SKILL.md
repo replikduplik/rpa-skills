@@ -275,10 +275,46 @@ SAP
   → Windows provider
   → name = "wnd[0]/usr/..." yolu
 
-Chrome/Firefox (Sigorta web portalleri)
+Chrome/Firefox — Epoch/X (Playwright) [YENİ STANDART]
+  → Playwright aktiviteleri
+  → "css=..." > "xpath=..." > "text=..."
+  → XPath'te tek tırnak kullan: xpath=//input[@id='x'] (backslash değil!)
+
+Chrome/Firefox — NM GetElement [ESKİ, dönüşüm planlanıyor]
   → NativeMessaging provider
   → id > data-testid > css > xpath önceliği
 
 Office
   → Windows provider + Office COM
 ```
+
+---
+
+## Epoch/X — Image Selector Sorunları
+
+### Import Sonrası Image Kaybı
+
+Workflow 2.0'a import edildiğinde image tanımları silinir. Bu bilinen bir platform sorunudur.
+
+**Geçici Çözüm — Base64 Dönüşümü:**
+
+```csharp
+// 1. Image dosyasını base64'e çevir (InvokeCode ile)
+string base64Image = System.Convert.ToBase64String(
+    System.IO.File.ReadAllBytes(@"C:\resimler\hedef_element.png"));
+
+// 2. Eski XAML'den image ID'sini al (metin editörü ile aç)
+// 3. XAML içindeki ID referansını base64 string ile değiştir
+```
+
+**Image.GetElement Yeni Parametreler (Epoch/X):**
+
+| Parametre | Açıklama |
+|---|---|
+| `retry` | Başarısız olursa tekrar dene |
+| `retrydelaycount` | Yeniden deneme aralığı (ms) |
+| `cache` | Önceki eşleşmeyi önbellekle |
+| `matchmode` | `accurate` / `pyramid` / `pyramidfast` |
+| `tracklastmatch` | Son eşleşme konumunu izle |
+
+**Öneri:** `matchmode=pyramid` hız/doğruluk dengesi için iyi başlangıç noktası.

@@ -1,16 +1,12 @@
 # documentation
 docs/
 
+# özel / paylaşılmayan veriler
+WhatsApp*/
+
+# üretilen dağıtım dosyaları (kaynak SKILL.md'ler zaten repoda)
+*.plugin
+*.skill
+
 # other ignored directories
-node_modules/
-dist/
-build/
-.next/
-.vercel/
-.npm/
-.pnp/
-.yarn/
-.yarn/cache/
-.yarn/unplugged/
-.yarn/build-state.yml
-.yarn/install-state.gz
+node_mo

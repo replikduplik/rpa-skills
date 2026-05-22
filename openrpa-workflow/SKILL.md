@@ -135,15 +135,107 @@ if (!decimal.TryParse(prim, out decimal primTutar) || primTutar <= 0)
 | `CloseApplication` | Finally bloğunda temizlik |
 | `GetElement` | UI element bul (RPA'nın çekirdeği) |
 | `ClickElement` | Tıkla (Virtual veya gerçek) |
+| `Click Element and Verify` | Tıkla + doğrula + retry (Epoch/X) |
 | `TypeText` | Klavye girdisi |
 | `InvokeCode` | C# satır içi kod |
 | `InvokePowerShell` | PowerShell script |
 | `InvokeWorkflow` | Alt workflow çağır |
-| `Delay` | Bekleme (sadece zorunluysa) |
+| `Delay` | Bekleme (sadece zorunluysa — Epoch/X'te minimize et) |
 | `TryCatch` | Hata yakalama |
 | `ForEach / BreakableLoop` | Döngü |
+| `Foreach DataRow` | DataTable satır döngüsü (Epoch/X) |
+| `Timeout` | Toplam süre sınırı sarmalayıcı (Epoch/X) |
+| `Get and Update RPA Settings` | Ayar okuma/yazma (Epoch/X) |
+| `EpochxWriteLine` | Debug output — Console.WriteLine yerine (Epoch/X) |
+| `Comment Out` | Aktiviteyi geçici devre dışı bırak (Epoch/X) |
 
 **TypeText özel tuşlar:** `{Enter}`, `{Tab}`, `{F4}`, `{F8}`, `{Escape}`, `{Ctrl+a}`, `{Alt+F4}`
+
+---
+
+## Epoch/X — Playwright ile Web Otomasyon
+
+Epoch/X'te web otomasyon için NativeMessaging yerine **Microsoft.Playwright** tabanlı aktiviteler kullanılır.
+
+### Playwright Aktiviteleri
+
+```
+Playwright Open URL    → tarayıcı aç + URL'ye git
+Playwright Click       → elemente tıkla
+Playwright Fill        → alana değer gir (TypeText yerine)
+Playwright Get         → element değerini oku
+Playwright Exists      → element var mı? (bool döner)
+Playwright Close Tab   → mevcut sekmeyi kapat
+Playwright Close Browser → tüm tarayıcıyı kapat
+```
+
+### Playwright Selector Sözdizimi
+
+```csharp
+// CSS selector (önerilen)
+"css=input#tcKimlik"
+"css=button.btn-primary"
+"css=.premium-result span.amount"
+
+// XPath — KRİTİK: tek tırnak kullan, backslash değil!
+"xpath=//input[@id='Username']"       // ✅ DOĞRU
+"xpath=//input[@id=\'Username\']"     // ❌ YANLIŞ — parse hatası
+
+// Görünen metin
+"text=Giriş Yap"
+
+// Placeholder
+"placeholder=TC Kimlik Numarası"
+```
+
+### Playwright Web Portal Giriş Şablonu
+
+```
+Playwright Open URL
+  url: "https://portal.sigorta.com/login"
+
+Playwright Fill
+  selector: "css=input[name='username']"
+  value: {kullanici}
+
+Playwright Fill
+  selector: "css=input[name='password']"
+  value: {sifre}
+
+Playwright Click
+  selector: "css=button[type='submit']"
+
+Playwright Exists
+  selector: "css=.dashboard-header"
+  Timeout: 15000ms   ← giriş başarılı doğrulaması
+```
+
+### CAPTCHA Sorunu (Sigorta Portalleri)
+
+Bazı sigorta portalleri (Garanti BBVA, bazı sigorta siteleri) CAPTCHA içeriyor.
+Mevcut yaklaşımlar:
+
+```
+1. Google Lens / OCR tabanlı çözüm (deneysel, yanlış okuma riski)
+2. Manuel müdahale: robot durur, operatör CAPTCHA'yı çözer, devam eder
+3. CAPTCHA API servisi entegrasyonu (planlamada)
+```
+
+**Dikkat:** CAPTCHA çözümü başarısız olursa hesap kilitlenebilir.
+Log'a yaz, WorkItem'ı "manual_intervention" state'ine çek, bildirim gönder.
+
+### Playwright vs NM — Hangisi Ne Zaman
+
+```
+Playwright kullan:
+  → Yeni Epoch/X workflow yazarken (standart)
+  → SPA (React/Angular) siteler
+  → Dinamik DOM, AJAX ağır siteler
+
+NM GetElement kullan:
+  → Eski workflow'u korurken
+  → Playwright toolbox'ta yoksa
+```
 
 ---
 
