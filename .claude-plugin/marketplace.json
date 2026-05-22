@@ -1,13 +1,13 @@
 {
-  "name": "epochx-rpa-skills",
-  "description": "Epoch/X Creator Studio 2.0 icin uzmanlasmis Claude skill seti. Sigorta sektoru odakli OpenRPA gelistirme asistani.",
+  "name": "openrpa-skills",
+  "description": "OpenRPA / Creator Studio gelistirme asistani. Sigorta sektoru odakli RPA skill seti.",
   "owner": {
-    "name": "Cagdas"
+    "name": "replikduplik"
   },
   "plugins": [
     {
       "name": "openrpa-assistant",
-      "description": "Workflow tasarimi, Playwright web otomasyon, selector, debug, review, C#, Polisoft ve OpenFlow icin kapsamli rehber.",
+      "description": "Workflow tasarimi, web otomasyon, selector, debug, review, C#, Polisoft ve OpenFlow icin kapsamli rehber.",
       "source": "."
     }
   ]
