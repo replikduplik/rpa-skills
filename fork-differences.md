@@ -111,7 +111,7 @@ Vanilla OpenRPA'da bulunmayan, Epoch/X toolbox'ında yer alan aktiviteler:
 - Her Save'de otomatik snapshot alınır
 - `Version` butonu ile commit mesajıyla Azure DevOps'a push yapılır
 - **Son versiyon push edilmeden workflow çalıştırılamaz**
-- Proje ismi zorunlu format: `[3 büyük harf][3 rakam]` (örn: `DOG101`, `UNI103`)
+- Proje ismi zorunlu format: `[3 büyük harf][3 rakam]` (örn: `SIG101`, `OTO103`)
 - Debug Play modu: versiyonlama istemeden, Business Log basmadan test çalışması
 
 **Yaygın Hata:**
@@ -201,7 +201,7 @@ Kullanım: mail şablonları, eşik değerleri, sistem adresleri gibi sabit değ
 
 **Vanilla OpenFlow:** `wss://app.openiap.io`
 
-**Epoch/X Orchestrator:** `wss://orchestrator.epochaix.co/` (müşteriye özel subdomain mümkün)
+**Epoch/X Orchestrator:** `wss://orchestrator.sirket.com/` (müşteriye özel subdomain mümkün)
 
 **Yaygın Hata:**
 ```
@@ -256,3 +256,4 @@ Status bar'da görünür: `NM : offline`
 2. Claude sana vanilla OpenRPA sözdizimi söylerse ve Epoch/X'te farklı çalışıyorsa:
    - Fork farkı olarak kaydet
    - Claude'u düzelt: "Epoch/X'te bu farklı çalışıyor: ..."
+ 

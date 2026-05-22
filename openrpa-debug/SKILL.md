@@ -447,7 +447,7 @@ Delay 500ms          ← kritik — bu delay olmadan update çalışmayabilir
 ### Orchestrator Bağlantı Kesilmesi
 
 ```
-[Debug] Disconnected from wss://orchestrator.epochaix.co/ 
+[Debug] Disconnected from wss://orchestrator.sirket.com/ 
 reason: Unable to connect to the remote server
 ```
 
@@ -561,3 +561,4 @@ Error: Access denied, no authorization to UpdateOne with current ACL
 **Sebep:** Kullanıcının ilgili kayıt üzerinde güncelleme yetkisi yok.
 
 **Çözüm:** Orchestrator admin paneline root kullanıcıyla giriş → kullanıcı yetkilerini düzenle.
+ 
