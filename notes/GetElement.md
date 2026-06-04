@@ -79,15 +79,57 @@ xpath=//button[3]          ⚠️
 ✅ Web/SAP için minimum Timeout=15000
 ```
 
-### 2. MinResults=1 ama element bazen yok
+### 2. MinResults=0 kullanınca null kontrolü atlamak
+
+`MinResults=0` ile `GetElement` çalıştırılırsa element bulunamadığında aktivite `Nothing`
+(null) döner, exception fırlatmaz. Ama sonraki adımda `.Length`, `.Value` gibi property'ye
+doğrudan erişmek `NullReferenceException` üretir.
 
 ```
-❌ MinResults=1 → Element yoksa exception → workflow çöker
-✅ MinResults=0 → null kontrol et:
-    If (element != null) ...
+❌ MinResults=0 → element null döner → If [elements.Length = 0] → NullReferenceException!
+
+✅ MinResults=0 → null-safe kontrol:
+    If [elements Is Nothing OrElse elements.Length = 0]
+    //  ^^^^^^^^^^^^^^^^^^^^
+    //  Önce null mu diye sor, sonra uzunluğa bak
 ```
 
-### 3. Dinamik idx kullanımı
+**Sık görülen örüntü — login kontrol:**
+```
+GetElement
+  Selector: [giriş başarılı elementi]
+  MinResults: 0
+  → isLogin değişkenine yaz
+
+If [isLogin Is Nothing OrElse isLogin.Length = 0]
+  Then → Giriş başarısız, tekrar dene
+  Else → Giriş başarılı, devam et
+```
+
+Tek element için (`OutArgument<IElement>` tipi):
+```
+If [loginElem Is Nothing]       ← array değil, direkt null kontrolü
+```
+
+### 3. `Timeout="{x:Null}"` — Sonsuz Bekleme Tuzağı
+
+XAML'da `Timeout="{x:Null}"` görüyorsan bu aktivite **sonsuza kadar bekler**. Platform
+null'ı "sınırsız bekle" olarak yorumlar. Element hiç gelmeyecekse robot takılır.
+
+Özellikle `BreakableDoWhile` veya `BreakableWhile` içinde kullanıldığında döngüyü de
+sonsuzlaştırır — dışarıdan müdahale edilene kadar robot kilitli kalır.
+
+```
+❌ GetElement Timeout="{x:Null}"   ← sonsuz bekleme, robot kilitlenebilir
+
+✅ GetElement Timeout="00:00:10"   ← 10 saniye sonra ElementNotFoundException fırlatır
+   veya
+✅ GetElement Timeout="00:00:30"   ← yavaş sayfalar için 30 saniye
+```
+
+**Nasıl kontrol ederim?** XAML dosyasında `x:Null` ara — her biri potansiyel risk noktası.
+
+### 4. Dinamik idx kullanımı
 
 ```
 ❌ selector: idx=5 → UI değişince kırılır

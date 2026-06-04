@@ -228,6 +228,46 @@ GetElement
 
 ---
 
+## ⚠️ Selector'da Asla Bulunmaması Gerekenler
+
+### Hardcoded Oturum Parametreleri (Session ID, Nonce, State)
+
+Web portal selector'larının URL kısmına oturum bazlı dinamik parametreler gömülmesi
+son derece yaygın bir hatadır. Robot ilk açılışta çalışır, ikinci çalışmada tamamen kırılır.
+
+```xml
+❌ YANLIŞ — oturum parametreleri sabit yazılmış
+<nativeapp browser="chrome"
+  url="https://portal.dogasigorta.com/login?state=0da6e6d4db864bb3&nonce=e09f2fb1c9" />
+<ctrl xpath="//div[@id='HasarAra']//tr[@hasarIslemId='160420261449h3tr']/td[18]" />
+
+Sorun:
+- state= ve nonce= her oturumda farklı → ikinci çalışmada element bulunamaz
+- hasarIslemId= sabit bir işlem kimliği → robot her seferinde aynı kayda gider
+
+✅ DOĞRU — dinamik parametreler URL'den çıkarılmış
+<nativeapp browser="chrome" url="https://portal.dogasigorta.com/login*" />
+<ctrl xpath="//div[@id='HasarAra']//tr[td[contains(@class,'hasar-id')]]/td[18]" />
+
+hasarIslemId değeri varsa dinamik değişkenden alınmalı:
+  selector: "...hasarIslemId=[out_HasarIslemId]..."
+```
+
+**Kontrol listesi — selector URL'lerine bak:**
+
+| Parametre türü | Örnek | Risk |
+|---|---|---|
+| OAuth state | `state=abc123` | Her oturumda farklı → her seferinde kırılır |
+| Nonce | `nonce=xyz789` | Her oturumda farklı |
+| İşlem ID | `hasarIslemId=160420` | Sabit → robot hep aynı kayda gider |
+| Session token | `sessionId=aBc123` | Sabit → oturum süresi dolarsa kırılır |
+
+**Kural:** Selector URL'lerinde `?` karakterinden sonraki tüm parametreleri sorgula.
+Değer sabit ve anlamlıysa (işlem kimliği gibi) → dinamik değişkenden al.
+Değer rastgele/oturum bazlıysa → URL'den tamamen çıkar, wildcard kullan.
+
+---
+
 ## Sigorta Uygulaması Özel Durumlar
 
 ### Polisoft Grid'den Veri Okuma

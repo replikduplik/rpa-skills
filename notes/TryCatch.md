@@ -81,13 +81,45 @@ InvalidOperationException → Geçersiz durum
    → Her durumda (başarı veya hata) çalışır
 ```
 
-### 3. Rethrow yerine Exception at
+### 3. `throw ex` Kullanımı — Stack Trace Kaybı [ÖNEMLİ]
+
+`throw ex;` yazmak, orijinal exception'ın stack trace'ini tamamen siler. Hatanın nerede
+başladığını bir daha bulamazsın. Bu C#'ın en yaygın anti-pattern'lerinden biridir.
 
 ```csharp
-// ❌ Yeni exception — orijinal stack trace kaybolur
+// ❌ YANLIŞ — throw ex: stack trace burada sıfırlanır
+catch (Exception ex)
+{
+    LogHata(ex.Message);
+    throw ex;   // <-- ex nesnesini fırlatma! Orijinal iz kaybolur.
+}
+
+// ✅ DOĞRU — throw: orijinal exception aynen iletilir
+catch (Exception ex)
+{
+    LogHata(ex.Message);
+    throw;   // Parametresiz throw = stack trace korunur
+}
+
+// ✅ DOĞRU — yeni exception sarmalamak istiyorsan InnerException ekle
+catch (Exception ex)
+{
+    throw new Exception("PDF işleme sırasında hata: " + ex.Message, ex);
+    //                                                              ^^
+    //                                              innerException olarak ekle
+}
+```
+
+**Pratik kural:** Catch bloğunda exception'ı tekrar fırlatman gerekiyorsa ya `throw;` yaz
+ya da `new Exception("mesaj", ex)` ile sar. `throw ex;` hiçbir zaman yazma.
+
+### 4. Rethrow yerine yeni Exception at
+
+```csharp
+// ❌ İzlenemeyen hata — orijinal kaybolur
 catch (Exception e)
 {
-    throw new Exception("Bir hata oluştu");
+    throw new Exception("Bir hata oluştu");  // ex inner exception değil
 }
 
 // ✅ Rethrow aktivitesi veya:
@@ -169,7 +201,7 @@ While (deneme < 3 AND basarili == False)
     └── Catch (Exception e)
         ├── deneme = deneme + 1
         ├── Log → "Deneme " + deneme + " başarısız: " + e.Message
-        └── Delay: 2000 * deneme   ← exponential backoff
+        └── [GetElement Timeout ile bekle — Delay yasak KZ-06]
 ```
 
 ---

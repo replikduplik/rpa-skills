@@ -1,13 +1,26 @@
 ---
 name: openrpa-csharp
 description: >
-  Use when writing C# code inside OpenRPA InvokeCode activity. Triggers on:
-  "InvokeCode", "C# kodu", "nasıl yazarım C#", "string dönüşüm", "tarih format",
-  "Excel COM", "DataTable", "LINQ", "dosya okuma", "HTTP istek", "JSON parse",
-  "REST API", "regex", "tip dönüşümü", "TC kimlik", "prim hesabı".
+  Use when writing C# expressions in Assign or If activities, refactoring existing
+  InvokeCode blocks to platform activities, or developing custom activities.
+  Also use when reviewing InvokeCode for [KZ-09] violations and finding replacements.
+  Triggers on: "C# ifadesi", "Assign expression", "InvokeCode refactor", "InvokeCode
+  kaldır", "özel aktivite yaz", "C# nasıl yazılır", "string dönüşüm", "tarih format",
+  "DateTime parse", "decimal hesapla", "LINQ", "HTTP istek", "JSON parse",
+  "regex C#", "TC kimlik doğrula", "Excel COM", "DataTable LINQ",
+  "throw ex", "stack trace", "C# hata yakalama".
 ---
 
-# OpenRPA — InvokeCode C# Rehberi
+# OpenRPA — C# İfade ve Refactoring Rehberi
+
+> ⛔ **[KZ-09] InvokeCode production sürecinde yasaktır.**
+> Bu skill'deki C# kod blokları iki amaç için kullanılır:
+> 1. **Özel aktivite geliştirme** — InvokeCode'daki mantığı kalıcı bir `.cs` aktivite sınıfına taşımak için referans
+> 2. **Geliştirme/debug ortamı** — production'a geçmeden önce hızlı prototipleme
+>
+> Production workflow'unda `InvokeCode` görürsen → denetimde KZ-09 ihlali alırsın.
+> Yapılacak iş: InvokeCode içindeki kodu eşdeğer özel aktiviteye taşı veya
+> mevcut platform aktivitesini kullan (bkz. `openrpa-workflow`).
 
 ## InvokeCode Temel Kurallar
 
@@ -20,7 +33,10 @@ description: >
 3. using direktifi yok — tam namespace kullan:
      System.DateTime.Now  (DateTime.Now değil)
      System.Text.StringBuilder
-4. Hata → workflow TryCatch'e fırlatır (throw kullan)
+4. Hata → workflow TryCatch'e fırlatır:
+      throw;       ← orijinal exception'ı ilet (stack trace korunur)
+      throw ex;    ← ❌ YASAK: stack trace sıfırlanır, hata nerede başladı bilinemez
+      throw new Exception("mesaj", ex);  ← sarmalamak istiyorsan innerException ekle
 5. Debug output:
    - Epoch/X Creator Studio → EpochxWriteLine aktivitesi kullan (Console.WriteLine desteklenmiyor!)
    - Vanilla OpenRPA       → Console.WriteLine Output panelinde görünür

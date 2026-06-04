@@ -138,6 +138,40 @@ While (kosul)
      If (item == null) → Break
 ```
 
+### 6. BreakableDoWhile'da `Or` ile Yazılan Yanlış Çıkış Koşulu
+
+Bu özellikle görüntü tabanlı bekleme döngülerinde çok sık yapılan hata. `Or` kullanınca
+koşulun bir parçası her zaman `True` kalabilir ve döngü hiç bitmez.
+
+```
+❌ YANLIŞ — Or operatörü sonsuz döngüye açık kapı bırakır
+BreakableDoWhile
+  Condition: [elem.Length = 0 Or sayac < 60]
+  //          ^^^^^^^^^^^^^^^^^
+  // GetElement görüntüyü hiç bulamazsa elem null kalır
+  // Nothing.Length = 0 → True, sayac büyüse bile döngü bitmez
+
+❌ Ayrıca: elem null iken elem.Length çağrısı → NullReferenceException!
+```
+
+**Doğru yaklaşım — null kontrol + And ile:**
+```
+✅ DOĞRU
+BreakableDoWhile
+  Condition: [(elem Is Nothing OrElse elem.Length = 0) And sayac < 60]
+  //          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^
+  //          Null-safe kontrol                        VE sayaç sınırı
+
+  Gövde:
+    GetElement → elem (Timeout="00:00:10")  ← sonsuz Timeout KULLANMA
+    Assign: sayac = sayac + 1
+    If [sayac >= 60] → Break  ← güvenlik çıkışı
+```
+
+**Özet kural:** BreakableDoWhile koşulunda döngüyü sürdüren parçalar `And` ile bağlanmalı,
+`Or` ile değil. Şöyle düşün: koşul `True` olduğu sürece döngü devam eder — `Or`'un
+herhangi bir tarafı `True` kalırsa çıkış olmaz.
+
 ### 4. ForEach içinde yanlış TypeArgument
 
 ```

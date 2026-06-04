@@ -1,8 +1,25 @@
 # InvokeCode
 
+> ⛔ **[KZ-09] InvokeCode production workflow'larında YASAKTIR.**
+>
+> Bu note iki amaç için tutulmaktadır:
+> 1. **Mevcut InvokeCode bloklarını anlamak** — denetim veya refactoring sırasında karşılaştığın kodu okumak için
+> 2. **Özel aktivite geliştirmek** — InvokeCode içindeki mantığı kalıcı bir platform aktivitesine taşırken referans almak
+>
+> **Karşılığı olan platformaktivitelerine geç:**
+> - `Regex.Match / Matches / Replace` → InvokeCode+Regex yerine
+> - `ReadPDF / ReadExcel / ReadCSV` → iTextSharp/Spire yerine
+> - `WriteRange / WriteCell / WriteExcel` → Spire.Xls yerine
+> - `Match` / `If` + `Assign` → basit hesaplamalar için
+> - `ForEachOf<T>` + `Assign` → döngüsel toplama için
+>
+> Production'da InvokeCode görürsen → denetimde KZ-09 ihlali alırsın.
+
 ## Ne Yapar
 
-Workflow içinde C# kodu çalıştırır. Yerleşik aktivitelerle yapılamayan işlemler, veri dönüşümleri, hesaplamalar, harici API çağrıları ve Excel COM işlemleri için kullanılır.
+Workflow içinde VB, C#, PowerShell, Python veya AutoHotkey kodu çalıştırır.
+**Production süreçlerinde kullanılmamalıdır [KZ-09].** Mevcut bir platform aktivitesi
+karşılayamıyorsa yeni özel aktivite geliştirilir.
 
 ---
 

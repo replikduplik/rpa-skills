@@ -42,6 +42,12 @@ Her OpenRPA sorusunda **önce bu skill**. Prompt'u analiz et → doğru kaynağa
 | `notes/InvokeWorkflow.md` | Alt workflow çağırma, parametre |
 | `notes/Delay.md` | Bekleme — ne zaman kullanılır/kullanılmaz |
 | `notes/ForEach-BreakableLoop.md` | Döngü tipleri, Break, bellek |
+| `notes/MetricLog.md` | UI etkileşim süresi ölçümü — KZ-07 zorunluluğu |
+| `notes/CreateYouTrackIssue.md` | YouTrack hata kaydı — KZ-12 zorunluluğu |
+| `notes/ThrowBusinessRuleException.md` | İş hatası fırlatma, BusinessException vs SystemException |
+| `notes/GetRPASetting.md` | Konfigürasyon okuma/yazma — KZ-01 zorunluluğu |
+| `notes/BusinessLog.md` | Insert+Update çifti, Identifier tekrarı, Role/GroupId pattern |
+| `notes/Regex.md` | Match, Matches, Replace aktiviteleri — InvokeCode+Regex yerine [KZ-09] |
 
 ### Canlı Belgeler
 
@@ -73,8 +79,28 @@ Prompt içeriyorsa               → Git buraya
 "ForEach", "döngü", "loop"      → notes/ForEach-BreakableLoop.md
 "OpenApplication", "pencere"    → notes/OpenApplication.md
 "Excel kilitlendi", "COM hatası" → openrpa-debug Bölüm 4 + openrpa-workflow Excel COM
-"BusinessException", "iş hatası" → openrpa-workflow Bölüm 2 (Retry + İş/Sistem ayrımı)
+"BusinessException", "iş hatası" → openrpa-workflow Bölüm 2 + notes/ThrowBusinessRuleException.md
 "Console.WriteLine", "EpochxWriteLine" → openrpa-csharp InvokeCode Temel Kurallar
+"MetricLog", "KZ-07", "metrik"  → notes/MetricLog.md
+"YouTrack", "KZ-12", "CreateYouTrack" → notes/CreateYouTrackIssue.md
+"GetRpaSetting", "GetRPASetting", "KZ-01", "ayar" → notes/GetRPASetting.md
+"GetTextResource", "KZ-14", "sabit metin" → openrpa-workflow Bölüm 9
+"HYS", "false positive", "hata sayılmaz" → openrpa-review "Hata Sayılmayacaklar"
+"DeleteAllRows", "satır sil"    → openrpa-workflow ⚠️ Platform Uyarıları
+"CommandTimeout", "SQL timeout" → openrpa-workflow ⚠️ Platform Uyarıları
+"throw ex", "stack trace"       → notes/TryCatch.md + openrpa-csharp
+"IsNullOrEmpty", "null kontrol", "OrElse" → notes/GetElement.md
+"Timeout Null", "{x:Null}"      → notes/GetElement.md
+"Or operatörü", "DoWhile koşul", "sonsuz döngü" → notes/ForEach-BreakableLoop.md
+"CommentOut credential", "yorum şifre" → openrpa-review Credential Güvenliği
+"item.Value atama", "TypeText mi Assign mi" → openrpa-workflow
+"state=", "nonce=", "hasarIslemId", "session parametresi" → openrpa-selector
+"HyperNodeInsertBusinessLog", "business log", "Insert Update" → notes/BusinessLog.md
+"Match aktivitesi", "Matches", "Regex" → notes/Regex.md
+"precondition", "ön kontrol", "workflow başlangıç" → openrpa-workflow
+"ters boolean", "bool adı yanlış" → openrpa-review Değişken Yönetimi
+"= True koşul", "= False koşul", "redundant" → openrpa-review Değişken Yönetimi
+"login tekrar", "login factoring", "tekrarlayan sekans" → openrpa-review Modülerlik
 "fork farkı keşfettim"          → fork-differences.md güncelle
 "yeni aktivite notu"            → notes/ altına yeni .md ekle
 "yeni şablon"                   → templates/ altına .md ekle
